@@ -6,56 +6,91 @@
  */
 
 import {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {ImageViewer} from 'shared/ui/ImageViewer';
 import {Photos} from 'shared/ui/Photo';
 import {RefreshControl} from 'shared/ui/RefreshControl';
-import {getPhotos, IPhoto} from './entities/photos';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import photosStore from 'shared/store';
+import {observer} from 'mobx-react-lite';
+import {COLOR_MAIN} from 'shared/styles/colors';
+import {Round} from 'shared/ui/Round';
 
-export const App = () => {
+const QUERY_DATA = ['ocean', 'flower', 'nature', 'travel', 'summer', 'winter'];
+
+export const App = observer(() => {
   const [photoUrl, setPhotoUrl] = useState<string>();
-  const [photosData, setPhotosData] = useState<IPhoto[]>([]);
   const {top, bottom} = useSafeAreaInsets();
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await getPhotos({params: {query: 'ocean', per_page: 20}});
-        console.log(JSON.stringify(res.photos, null, 4));
-        setPhotosData(res.photos);
-      } catch (e) {
-        console.log(e);
-      }
-    })();
+    photosStore.start();
   }, []);
 
   return (
-    <View style={{flex: 1, marginTop: top}}>
+    <View style={[styles.view, {marginTop: top}]}>
       <ImageViewer image={photoUrl} onClose={() => setPhotoUrl(undefined)} />
       <FlatList
         contentContainerStyle={[
           styles.container,
-          {paddingBottom: bottom + 24, paddingTop: 24},
+          {paddingBottom: bottom, paddingTop: 24},
         ]}
         showsVerticalScrollIndicator={false}
-        data={photosData}
+        data={photosStore.photos}
         numColumns={2}
-        columnWrapperStyle={{gap: 8}}
+        ListHeaderComponent={
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              marginBottom: 8,
+              gap: 8,
+            }}>
+            {QUERY_DATA.map(item => (
+              <Round
+                active={item === photosStore.query}
+                text={item}
+                onPress={photosStore.setQuery}
+              />
+            ))}
+          </ScrollView>
+        }
+        columnWrapperStyle={{gap: 8, paddingHorizontal: 16}}
         keyExtractor={(_, index) => `${index}_photos`}
+        onEndReached={() => {
+          photosStore.add();
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={false}
+            onRefresh={() => {
+              photosStore.start();
+            }}
+          />
+        }
+        ListFooterComponent={
+          <View style={styles.loader}>
+            {photosStore.loading ? (
+              <ActivityIndicator size={'small'} color={COLOR_MAIN} />
+            ) : null}
+          </View>
+        }
         renderItem={({item}) => (
           <Photos
             url={item.src.medium}
             onPress={() => setPhotoUrl(item.src.large)}
           />
         )}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={() => {}} />
-        }
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   view: {
@@ -63,7 +98,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    paddingHorizontal: 16,
     gap: 8,
+  },
+  loader: {
+    height: 24,
   },
 });
