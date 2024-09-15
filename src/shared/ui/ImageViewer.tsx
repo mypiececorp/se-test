@@ -1,7 +1,16 @@
-import {Image, Modal, TouchableOpacity} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {Backdrop} from './Backdrop';
 import {XClose} from 'shared/icons/svg';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {COLOR_MAIN} from 'shared/styles/colors';
+import {useState} from 'react';
 
 export const ImageViewer = ({
   image,
@@ -11,6 +20,8 @@ export const ImageViewer = ({
   onClose?: () => void;
 }) => {
   const {top} = useSafeAreaInsets();
+  const [loading, setLoading] = useState(false);
+
   return (
     <Modal
       transparent
@@ -20,11 +31,46 @@ export const ImageViewer = ({
       <Backdrop />
       <TouchableOpacity
         onPress={onClose}
-        style={{position: 'absolute', top: top + 24, right: 24, zIndex: 2}}
+        style={[styles.button, {top: top + 24}]}
         hitSlop={8}>
         <XClose size={24} color="#FFF" />
       </TouchableOpacity>
-      <Image resizeMode="contain" src={image} style={{flex: 1}} />
+      <Image
+        onError={({nativeEvent}) =>
+          Alert.alert(nativeEvent.error, undefined, [{onPress: onClose}])
+        }
+        onLoadEnd={() => setLoading(false)}
+        onLoadStart={() => setLoading(true)}
+        resizeMode="contain"
+        src={image}
+        style={styles.image}
+      />
+      {loading && (
+        <ActivityIndicator
+          size={'large'}
+          color={COLOR_MAIN}
+          style={styles.loader}
+        />
+      )}
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    position: 'absolute',
+    right: 24,
+    zIndex: 2,
+  },
+  image: {
+    flex: 1,
+    zIndex: 1,
+  },
+  loader: {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    right: '50%',
+    bottom: '50%',
+  },
+});
