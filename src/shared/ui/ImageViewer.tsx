@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Image,
   Modal,
   StyleSheet,
@@ -9,6 +10,7 @@ import {Backdrop} from './Backdrop';
 import {XClose} from 'shared/icons/svg';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {COLOR_MAIN} from 'shared/styles/colors';
+import {useState} from 'react';
 
 export const ImageViewer = ({
   image,
@@ -18,6 +20,7 @@ export const ImageViewer = ({
   onClose?: () => void;
 }) => {
   const {top} = useSafeAreaInsets();
+  const [loading, setLoading] = useState(false);
 
   return (
     <Modal
@@ -32,12 +35,23 @@ export const ImageViewer = ({
         hitSlop={8}>
         <XClose size={24} color="#FFF" />
       </TouchableOpacity>
-      <Image resizeMode="contain" src={image} style={styles.image} />
-      <ActivityIndicator
-        size={'large'}
-        color={COLOR_MAIN}
-        style={styles.loader}
+      <Image
+        onError={({nativeEvent}) =>
+          Alert.alert(nativeEvent.error, undefined, [{onPress: onClose}])
+        }
+        onLoadEnd={() => setLoading(false)}
+        onLoadStart={() => setLoading(true)}
+        resizeMode="contain"
+        src={image}
+        style={styles.image}
       />
+      {loading && (
+        <ActivityIndicator
+          size={'large'}
+          color={COLOR_MAIN}
+          style={styles.loader}
+        />
+      )}
     </Modal>
   );
 };

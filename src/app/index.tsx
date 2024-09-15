@@ -47,11 +47,7 @@ export const App = observer(() => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 16,
-              marginBottom: 8,
-              gap: 8,
-            }}>
+            contentContainerStyle={styles.founds}>
             {QUERY_DATA.map(item => (
               <Round
                 active={item === photosStore.query}
@@ -61,7 +57,7 @@ export const App = observer(() => {
             ))}
           </ScrollView>
         }
-        columnWrapperStyle={{gap: 8, paddingHorizontal: 16}}
+        columnWrapperStyle={styles.columnWrapper}
         keyExtractor={(_, index) => `${index}_photos`}
         onEndReached={() => {
           photosStore.add();
@@ -100,7 +96,16 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: 8,
   },
+  columnWrapper: {
+    gap: 8,
+    paddingHorizontal: 16,
+  },
   loader: {
     height: 24,
+  },
+  founds: {
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    gap: 8,
   },
 });
