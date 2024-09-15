@@ -48,8 +48,9 @@ export const App = observer(() => {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.founds}>
-            {QUERY_DATA.map(item => (
+            {QUERY_DATA.map((item, index) => (
               <Round
+                key={`${index}_round`}
                 active={item === photosStore.query}
                 text={item}
                 onPress={photosStore.setQuery}
