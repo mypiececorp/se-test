@@ -34,8 +34,6 @@ export interface IMarket {
 }
 
 export async function getPhotos() {
-  const response = client
-    .get<IMarket[]>(GET_MARKETS, {params: {limit: '10'}})
-    .then(res => res.data);
+  const response = client.get<IMarket[]>(GET_MARKETS).then(res => res.data);
   return response;
 }
