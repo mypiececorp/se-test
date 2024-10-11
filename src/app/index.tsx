@@ -5,108 +5,29 @@
  * @format
  */
 
-import {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import {ImageViewer} from 'shared/ui/ImageViewer';
-import {Photos} from 'shared/ui/Photo';
-import {RefreshControl} from 'shared/ui/RefreshControl';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import photosStore from 'shared/store';
-import {observer} from 'mobx-react-lite';
-import {COLOR_MAIN} from 'shared/styles/colors';
-import {Round} from 'shared/ui/Round';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {NavigationContainer} from '@react-navigation/native';
+import {AboutScreen} from 'screen/About';
+import {TickersScreen} from 'screen/Tickers';
+import {RootTabParamList} from 'shared/types';
 
-const QUERY_DATA = ['ocean', 'flower', 'nature', 'travel', 'summer', 'winter'];
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
-export const App = observer(() => {
-  const [photoUrl, setPhotoUrl] = useState<string>();
-  const {top, bottom} = useSafeAreaInsets();
-
-  useEffect(() => {
-    photosStore.start();
-  }, []);
-
+export const App = () => {
   return (
-    <View style={[styles.view, {marginTop: top}]}>
-      <ImageViewer image={photoUrl} onClose={() => setPhotoUrl(undefined)} />
-      <FlatList
-        contentContainerStyle={[
-          styles.container,
-          {paddingBottom: bottom, paddingTop: 24},
-        ]}
-        showsVerticalScrollIndicator={false}
-        data={photosStore.photos}
-        numColumns={2}
-        ListHeaderComponent={
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.founds}>
-            {QUERY_DATA.map((item, index) => (
-              <Round
-                key={`${index}_round`}
-                active={item === photosStore.query}
-                text={item}
-                onPress={photosStore.setQuery}
-              />
-            ))}
-          </ScrollView>
-        }
-        columnWrapperStyle={styles.columnWrapper}
-        keyExtractor={(_, index) => `${index}_photos`}
-        onEndReached={() => {
-          photosStore.add();
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={() => {
-              photosStore.start();
-            }}
-          />
-        }
-        ListFooterComponent={
-          <View style={styles.loader}>
-            {photosStore.loading ? (
-              <ActivityIndicator size={'small'} color={COLOR_MAIN} />
-            ) : null}
-          </View>
-        }
-        renderItem={({item}) => (
-          <Photos
-            url={item.src.medium}
-            onPress={() => setPhotoUrl(item.src.large)}
-          />
-        )}
-      />
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator sceneContainerStyle={{backgroundColor: '#FFF'}}>
+        <Tab.Screen
+          name="About"
+          options={{title: 'О приложении'}}
+          component={AboutScreen}
+        />
+        <Tab.Screen
+          name="Tickers"
+          options={{title: 'Котировки', lazy: true}}
+          component={TickersScreen}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
-});
-
-const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-  },
-  container: {
-    flexGrow: 1,
-    gap: 8,
-  },
-  columnWrapper: {
-    gap: 8,
-    paddingHorizontal: 16,
-  },
-  loader: {
-    height: 24,
-  },
-  founds: {
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    gap: 8,
-  },
-});
+};
