@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const URL = 'https://api.poloniex.com/';
+const URL = 'https://api.jolpi.ca/ergast/f1/';
 
 export const client = axios.create({
   baseURL: URL,
@@ -10,30 +10,15 @@ export const client = axios.create({
   },
 });
 
-const GET_MARKETS = 'markets/ticker24h';
+export const LIMIT = 20;
 
-export interface IMarket {
-  symbol: string;
-  open: string;
-  low: string;
-  high: string;
-  close: string;
-  quantity: string;
-  amount: string;
-  tradeCount: number;
-  startTime: number;
-  closeTime: number;
-  displayName: string;
-  dailyChange: string;
-  bid: string;
-  bidQuantity: string;
-  ask: string;
-  askQuantity: string;
-  ts: number;
-  markPrice: string;
-}
-
-export async function getPhotos() {
-  const response = client.get<IMarket[]>(GET_MARKETS).then(res => res.data);
-  return response;
+export interface IDriver {
+  driverId: string;
+  permanentNumber: string;
+  code?: string;
+  url?: string;
+  givenName?: string;
+  familyName?: string;
+  dateOfBirth?: string;
+  nationality?: string;
 }
