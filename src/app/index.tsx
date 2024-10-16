@@ -5,29 +5,30 @@
  * @format
  */
 
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
-import {AboutScreen} from 'screen/About';
-import {TickersScreen} from 'screen/Tickers';
-import {RootTabParamList} from 'shared/types';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {DriversScreen} from 'screen/Drivers';
+import {DriverScreen} from 'screen/Driver';
+import {RootStackParamList} from 'shared/types';
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const App = () => {
   return (
     <NavigationContainer>
-      <Tab.Navigator sceneContainerStyle={{backgroundColor: '#FFF'}}>
-        <Tab.Screen
-          name="About"
-          options={{title: 'О приложении'}}
-          component={AboutScreen}
+      <Stack.Navigator
+        screenOptions={{contentStyle: {backgroundColor: '#FFF'}}}>
+        <Stack.Screen
+          name="Drivers"
+          options={{title: 'Главная'}}
+          component={DriversScreen}
         />
-        <Tab.Screen
-          name="Tickers"
-          options={{title: 'Котировки', lazy: true}}
-          component={TickersScreen}
+        <Stack.Screen
+          name="Driver"
+          options={{title: 'Гонщик'}}
+          component={DriverScreen}
         />
-      </Tab.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
