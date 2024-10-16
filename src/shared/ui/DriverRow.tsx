@@ -67,7 +67,7 @@ export const DriverRow = ({
       }}>
       <AnimationCell
         style={{fontWeight: '600'}}
-        value={`${familyName} ${givenName}` ?? ''}
+        value={`${familyName} ${givenName}`}
       />
       <AnimationCell value={nationality ?? ''} />
     </TouchableOpacity>
