@@ -10,7 +10,7 @@ export const client = axios.create({
   },
 });
 
-export const LIMIT = 20;
+export const LIMIT = 40;
 
 export interface IDriver {
   driverId: string;
